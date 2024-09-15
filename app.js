@@ -13,7 +13,7 @@ app.use(cors());
 mongoose.connect("mongodb+srv://sasank:123@cluster0.ulecm.mongodb.net/trainReservations?retryWrites=true&w=majority", {
   serverSelectionTimeoutMS: 5000
 }).then(() => {
-  console.log('Connected to MongoDB Atlas');
+  console.log('newly ?? Connected to MongoDB Atlas');
 }).catch(err => {
   console.error('Error connecting to MongoDB Atlas:', err.message);
 });
