@@ -1,6 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
+const cors = require('cors');
+
+const app = express();
+
+// Enable CORS for all routes
+app.use(cors());
+
+
 // MongoDB Connection
 mongoose.connect("mongodb+srv://sasank:123@cluster0.ulecm.mongodb.net/trainReservations?retryWrites=true&w=majority", {
   serverSelectionTimeoutMS: 5000
@@ -19,8 +27,6 @@ const seatSchema = new mongoose.Schema({
 });
 
 const Seat = mongoose.model('Seat', seatSchema);
-
-const app = express();
 app.use(express.json()); // To parse JSON body
 
 // Endpoint to get the current seat status
@@ -100,8 +106,8 @@ app.post('/reserve', async (req, res) => {
 });
 
 // Start the server
-app.listen(3000, function() {
-  console.log('Server is running on http://localhost:3000');
+app.listen(5000, function() {
+  console.log('Server is running on http://localhost:5000');
 });
 
 
