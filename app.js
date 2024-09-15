@@ -111,12 +111,12 @@ app.post('/reset', async (req, res) => {
     }
     seatData.seatStatus = "0".repeat(80); // Reset all 80 seats to '0'
     await seatData.save();
-    alert("seats set successful");
     res.json({ success: true, message: "Seats reset successfully." });
   } catch (err) {
     res.status(500).json({ error: 'Failed to reset seats' });
   }
 });
+
 
 
 
