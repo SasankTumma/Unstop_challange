@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train Seat Reservation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        #app {
+            width: 80%;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #seatsContainer {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .seat {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .available {
+            background-color: green;
+        }
+
+        .reserved {
+            background-color: red;
+            cursor: not-allowed;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label, input, button {
+            margin: 5px 0;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #reservedMessage {
+            margin-top: 10px;
+            color: #d9534f;
+        }
+
+        #reservedList {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Train Seat Reservation</h1>
+        <div id="seatsContainer"></div>
+        <form id="reservationForm">
+            <label for="numSeats">Number of Seats to Reserve (1-7):</label>
+            <input type="number" id="numSeats" name="numSeats" min="1" max="7">
+            <button type="submit">Reserve Seats</button>
+        </form>
+        <p id="reservedMessage"></p>
+        <p id="reservedList"></p>
+    </div>
+
+    <script>
+        async function fetchSeats() {
+            const res = await fetch('http://localhost:3000/seats');
+            const data = await res.json();
+            renderSeats(data.all_seats);
+        }
+    
+        function renderSeats(all_seats) {
+            const container = document.getElementById('seatsContainer');
+            container.innerHTML = ''; // Clear previous seats
+    
+            // Loop over 77 first (for 11 rows of 7, and 1 of 3)
+            for (let i = 0; i < 77; i += 7) {
+                for (let j = i; j < i + 7; j++) {
+                    const seatDiv = document.createElement('div');
+                    seatDiv.classList.add('seat', all_seats[j] === '0' ? 'available' : 'reserved');
+                    seatDiv.innerText = j + 1;
+                    container.appendChild(seatDiv);
+                }
+            }
+    
+            // Last row of 3 seats
+            for (let k = 77; k < 80; k++) {
+                const seatDiv = document.createElement('div');
+                seatDiv.classList.add('seat', all_seats[k] === '0' ? 'available' : 'reserved');
+                seatDiv.innerText = k + 1;
+                container.appendChild(seatDiv);
+            }
+        }
+    
+        document.getElementById('reservationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const numSeats = document.getElementById('numSeats').value;
+    
+            const res = await fetch('http://localhost:3000/reserve', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ numSeats: parseInt(numSeats) })
+            });
+    
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('reservedMessage').innerText = `Reserved Seats: ${data.reservedSeats.map(s => s + 1).join(', ')}`;
+                fetchSeats(); // Refresh seat status
+            } else {
+                document.getElementById('reservedMessage').innerText = 'Failed to reserve seats';
+            }
+        });
+    
+        fetchSeats(); // Initial load
+    </script>
+    
+</body>
+</html>
